@@ -1,0 +1,68 @@
+import telebot
+from telebot import types
+
+TOKEN = 'токен твоего бота'
+
+PHOTO_SCHEDULE_1 = r'C:"путь к фотке1"'
+PHOTO_SCHEDULE_2 = r'C:"путь к фотке2"'
+PHOTO_BELLS = r'C:"путь к фотке3"'
+PHOTO_MAP_1 = r'C:"путь к фотке4"'
+PHOTO_MAP_2 = r'C:"путь к фотке5"'
+PHOTO_MAP_3 = r'C:"путь к фотке6"'
+
+TEXT_HISTORY = """текст"""
+
+
+TEXT_IMPORTANT_DATES = """текст"""
+
+bot = telebot.TeleBot(TOKEN)
+
+def get_main_keyboard():
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    btn1 = types.KeyboardButton('кнопка1')
+    btn2 = types.KeyboardButton('кнопка2')
+    btn3 = types.KeyboardButton('кнопка3')
+    btn4 = types.KeyboardButton('кнопка4')
+    btn5 = types.KeyboardButton('кнопка5')
+    keyboard.add(btn1, btn2, btn3, btn4, btn5)
+    return keyboard
+
+@bot.message_handler(commands=['start'])
+def start(message):
+    bot.send_message(
+        message.chat.id,
+        'Добро пожаловать! Выбери нужный раздел, нажав кнопку внизу:',
+        reply_markup=get_main_keyboard()
+    )
+
+@bot.message_handler(func=lambda message: message.text == 'кнопка1')
+def schedule(message):
+    media = [
+        types.InputMediaPhoto(open(PHOTO_SCHEDULE_1, 'rb')),
+        types.InputMediaPhoto(open(PHOTO_SCHEDULE_2, 'rb'))
+    ]
+    bot.send_media_group(message.chat.id, media)
+
+@bot.message_handler(func=lambda message: message.text == 'кнопка2')
+def bells(message):
+    with open(PHOTO_BELLS, 'rb') as f:
+        bot.send_photo(message.chat.id, f)
+
+@bot.message_handler(func=lambda message: message.text == 'кнопка3')
+def map_school(message):
+    media = [
+        types.InputMediaPhoto(open(PHOTO_MAP_1, 'rb')),
+        types.InputMediaPhoto(open(PHOTO_MAP_2, 'rb')),
+        types.InputMediaPhoto(open(PHOTO_MAP_3, 'rb'))
+    ]
+    bot.send_media_group(message.chat.id, media)
+
+@bot.message_handler(func=lambda message: message.text == 'кнопка4')
+def history(message):
+    bot.send_message(message.chat.id, TEXT_HISTORY)
+
+@bot.message_handler(func=lambda message: message.text == 'кнопка5')
+def important_dates(message):
+    bot.send_message(message.chat.id, TEXT_IMPORTANT_DATES)
+
+bot.infinity_polling()
